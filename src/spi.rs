@@ -713,6 +713,20 @@ pub enum Event {
     Error,
 }
 
+/// Data Frame Format
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum DataFrameFormat {
+    Bits8,
+    Bits16,
+}
+
+/// Data Frame Format
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum BitOrder {
+    MsbFirst,
+    LsbFirst,
+}
+
 #[derive(Debug)]
 pub struct Spi<SPI, PINS> {
     spi: SPI,
@@ -743,6 +757,29 @@ impl<PINS> Spi<SPI1, PINS> {
     where
         PINS: Pins<SPI1>,
     {
+        Self::spi1_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi1_advanced(
+        spi: SPI1,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI1>,
+    {
         unsafe {
             const EN_BIT: u8 = 12;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -752,7 +789,7 @@ impl<PINS> Spi<SPI1, PINS> {
             bb::set(&rcc.apb2enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk2())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -780,6 +817,29 @@ impl<PINS> Spi<SPI2, PINS> {
     where
         PINS: Pins<SPI2>,
     {
+        Self::spi2_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi2_advanced(
+        spi: SPI2,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI2>,
+    {
         unsafe {
             const EN_BIT: u8 = 14;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -789,7 +849,7 @@ impl<PINS> Spi<SPI2, PINS> {
             bb::set(&rcc.apb1enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk1())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -816,6 +876,29 @@ impl<PINS> Spi<SPI3, PINS> {
     where
         PINS: Pins<SPI3>,
     {
+        Self::spi3_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi3_advanced(
+        spi: SPI3,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI3>,
+    {
         unsafe {
             const EN_BIT: u8 = 15;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -825,7 +908,7 @@ impl<PINS> Spi<SPI3, PINS> {
             bb::set(&rcc.apb1enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk1())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -848,6 +931,29 @@ impl<PINS> Spi<SPI4, PINS> {
     where
         PINS: Pins<SPI4>,
     {
+        Self::spi4_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi4_advanced(
+        spi: SPI4,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI4>,
+    {
         unsafe {
             const EN_BIT: u8 = 13;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -857,7 +963,7 @@ impl<PINS> Spi<SPI4, PINS> {
             bb::set(&rcc.apb2enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk2())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -879,6 +985,29 @@ impl<PINS> Spi<SPI5, PINS> {
     where
         PINS: Pins<SPI5>,
     {
+        Self::spi5_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi5_advanced(
+        spi: SPI5,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI5>,
+    {
         unsafe {
             const EN_BIT: u8 = 20;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -888,7 +1017,7 @@ impl<PINS> Spi<SPI5, PINS> {
             bb::set(&rcc.apb2enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk2())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -905,6 +1034,29 @@ impl<PINS> Spi<SPI6, PINS> {
     where
         PINS: Pins<SPI6>,
     {
+        Self::spi6_advanced(
+            spi,
+            pins,
+            mode,
+            freq,
+            clocks,
+            DataFrameFormat::Bits8,
+            BitOrder::MsbFirst,
+        )
+    }
+
+    pub fn spi6_advanced(
+        spi: SPI6,
+        pins: PINS,
+        mode: Mode,
+        freq: Hertz,
+        clocks: Clocks,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self
+    where
+        PINS: Pins<SPI6>,
+    {
         unsafe {
             const EN_BIT: u8 = 21;
             // NOTE(unsafe) this reference will only be used for atomic writes with no side effects.
@@ -914,7 +1066,7 @@ impl<PINS> Spi<SPI6, PINS> {
             bb::set(&rcc.apb2enr, EN_BIT);
         }
 
-        Spi { spi, pins }.init(mode, freq, clocks.pclk2())
+        Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
     }
 }
 
@@ -922,7 +1074,14 @@ impl<SPI, PINS> Spi<SPI, PINS>
 where
     SPI: Deref<Target = spi1::RegisterBlock>,
 {
-    pub fn init(self, mode: Mode, freq: Hertz, clock: Hertz) -> Self {
+    pub fn init(
+        self,
+        mode: Mode,
+        freq: Hertz,
+        clock: Hertz,
+        frame_format: DataFrameFormat,
+        bit_order: BitOrder,
+    ) -> Self {
         // disable SS output
         self.spi.cr2.write(|w| w.ssoe().clear_bit());
 
@@ -939,10 +1098,8 @@ where
         };
 
         // mstr: master configuration
-        // lsbfirst: MSB first
         // ssm: enable software slave management (NSS pin free for other uses)
         // ssi: set nss high = master mode
-        // dff: 8 bit frames
         // bidimode: 2-line unidirectional
         // spe: enable the SPI bus
         self.spi.cr1.write(|w| {
@@ -955,7 +1112,7 @@ where
                 .br()
                 .bits(br)
                 .lsbfirst()
-                .clear_bit()
+                .bit(bit_order == BitOrder::LsbFirst)
                 .ssm()
                 .set_bit()
                 .ssi()
@@ -963,7 +1120,7 @@ where
                 .rxonly()
                 .clear_bit()
                 .dff()
-                .clear_bit()
+                .bit(frame_format == DataFrameFormat::Bits16)
                 .bidimode()
                 .clear_bit()
                 .spe()
@@ -1069,12 +1226,65 @@ where
     }
 }
 
+impl<SPI, PINS> spi::FullDuplex<u16> for Spi<SPI, PINS>
+where
+    SPI: Deref<Target = spi1::RegisterBlock>,
+{
+    type Error = Error;
+
+    fn read(&mut self) -> nb::Result<u16, Error> {
+        let sr = self.spi.sr.read();
+
+        Err(if sr.ovr().bit_is_set() {
+            nb::Error::Other(Error::Overrun)
+        } else if sr.modf().bit_is_set() {
+            nb::Error::Other(Error::ModeFault)
+        } else if sr.crcerr().bit_is_set() {
+            nb::Error::Other(Error::Crc)
+        } else if sr.rxne().bit_is_set() {
+            // NOTE(read_volatile) read only 1 byte (the svd2rust API only allows
+            // reading a half-word)
+            return Ok(unsafe { ptr::read_volatile(&self.spi.dr as *const _ as *const u16) });
+        } else {
+            nb::Error::WouldBlock
+        })
+    }
+
+    fn send(&mut self, byte: u16) -> nb::Result<(), Error> {
+        let sr = self.spi.sr.read();
+
+        Err(if sr.ovr().bit_is_set() {
+            nb::Error::Other(Error::Overrun)
+        } else if sr.modf().bit_is_set() {
+            nb::Error::Other(Error::ModeFault)
+        } else if sr.crcerr().bit_is_set() {
+            nb::Error::Other(Error::Crc)
+        } else if sr.txe().bit_is_set() {
+            // NOTE(write_volatile) see note above
+            unsafe { ptr::write_volatile(&self.spi.dr as *const _ as *mut u16, byte) }
+            return Ok(());
+        } else {
+            nb::Error::WouldBlock
+        })
+    }
+}
+
 impl<SPI, PINS> embedded_hal::blocking::spi::transfer::Default<u8> for Spi<SPI, PINS> where
     SPI: Deref<Target = spi1::RegisterBlock>
 {
 }
 
 impl<SPI, PINS> embedded_hal::blocking::spi::write::Default<u8> for Spi<SPI, PINS> where
+    SPI: Deref<Target = spi1::RegisterBlock>
+{
+}
+
+impl<SPI, PINS> embedded_hal::blocking::spi::transfer::Default<u16> for Spi<SPI, PINS> where
+    SPI: Deref<Target = spi1::RegisterBlock>
+{
+}
+
+impl<SPI, PINS> embedded_hal::blocking::spi::write::Default<u16> for Spi<SPI, PINS> where
     SPI: Deref<Target = spi1::RegisterBlock>
 {
 }
