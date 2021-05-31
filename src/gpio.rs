@@ -273,6 +273,9 @@ macro_rules! gpio {
 
                         // Enable clock.
                         bb::set(&rcc.ahb1enr, $rcc_bit);
+
+                        // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+                        cortex_m::asm::dsb();
                     }
                     Parts {
                         $(
@@ -739,6 +742,19 @@ macro_rules! gpio {
                         };
 
                         $PXi { _mode: PhantomData }
+                    }
+                }
+
+                impl<MODE> $PXi<AlternateOD<MODE>> {
+                    /// Enables / disables the internal pull up
+                    pub fn internal_pull_up(&mut self, on: bool) {
+                        let offset = 2 * $i;
+                        let value = if on { 0b01 } else { 0b00 };
+                        unsafe {
+                            &(*$GPIOX::ptr()).pupdr.modify(|r, w| {
+                                w.bits((r.bits() & !(0b11 << offset)) | (value << offset))
+                            })
+                        };
                     }
                 }
 

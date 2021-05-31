@@ -10,7 +10,7 @@ use core::num::NonZeroU32;
 use core::ops::Shl;
 use rand_core::RngCore;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum ErrorKind {
     /// The RNG_CLK was not correctly detected (fRNG_CLK< fHCLK/16).
     /// See CECS in RNG peripheral documentation.
@@ -43,8 +43,9 @@ impl RngExt for RNG {
         cortex_m::interrupt::free(|_| {
             // enable RNG_CLK (peripheral clock)
             rcc.ahb2enr.modify(|_, w| w.rngen().enabled());
-            // give RNG_CLK time to start
-            let _ = rcc.ahb2enr.read().rngen().is_enabled();
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
 
             // reset the RNG
             rcc.ahb2rstr.modify(|_, w| w.rngrst().set_bit());

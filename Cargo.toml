@@ -19,48 +19,46 @@ license = "0BSD"
 name = "stm32f4xx-hal"
 readme = "README.md"
 repository = "https://github.com/stm32-rs/stm32f4xx-hal"
-version = "0.8.3"
+version = "0.9.0"
 
 [package.metadata.docs.rs]
-features = ["stm32f429", "rt", "usb_fs"]
+features = ["stm32f429", "rt", "usb_fs", "can", "i2s", "fsmc_lcd"]
 targets = ["thumbv7em-none-eabihf"]
 
 [dependencies]
-cortex-m = ">=0.5.8,<0.7"
+bxcan = { version = ">=0.4, <0.6", optional = true }
+cortex-m = "0.7"
 cortex-m-rt = "0.6.10"
-nb = "0.1.2"
-rand_core = "0.5.1"
-stm32f4 = "0.11"
+nb = "1"
+rand_core = "0.6"
+rtcc = "0.2"
+stm32f4 = "0.13"
 synopsys-usb-otg = { version = "0.2.0", features = ["cortex-m"], optional = true }
 sdio-host = { version = "0.5.0", optional = true }
 embedded-dma = "0.1.2"
+bare-metal = { version = "1" }
+cast = { default-features = false, version = "0.2.2" }
+void = { default-features = false, version = "1.0.2" }
+embedded-hal = { features = ["unproven"], version = "0.2.3" }
+display-interface = { version = "0.4.0", optional = true }
 
-[dependencies.bare-metal]
-version = "0.2.5"
-features = ["const-fn"]
-
-[dependencies.cast]
-default-features = false
-version = "0.2.2"
-
-[dependencies.void]
-default-features = false
-version = "1.0.2"
-
-[dependencies.embedded-hal]
-features = ["unproven"]
-version = "0.2.3"
+[dependencies.stm32_i2s_v12x]
+version = "0.2.0"
+optional = true
 
 [dev-dependencies]
 panic-semihosting = "0.5.3"
 cortex-m-semihosting = "0.3.3"
 arrayvec = { version = "0.5.1", default-features = false }
 panic-halt = "0.2.0"
-ssd1306 = "0.4"
+ssd1306 = "0.5"
 embedded-graphics = "0.6.2"
 usb-device = "0.2.5"
 usbd-serial = "0.1.0"
 micromath = "1.0.0"
+cortex-m-rtic = "0.5.6"
+st7789 = "0.5.0"
+panic-rtt-core = "0.2.1"
 
 [features]
 device-selected = []
@@ -88,7 +86,13 @@ stm32f479 = ["stm32f4/stm32f469", "device-selected"]
 usb_fs = ["synopsys-usb-otg", "synopsys-usb-otg/fs"]
 usb_hs = ["synopsys-usb-otg", "synopsys-usb-otg/hs"]
 
+can = ["bxcan"]
+
 sdio = ["sdio-host"]
+
+i2s = ["stm32_i2s_v12x"]
+
+fsmc_lcd = ["display-interface"]
 
 [profile.dev]
 debug = true
@@ -138,3 +142,35 @@ required-features = ["rt", "stm32f407"]
 [[example]]
 name = "qei"
 required-features = ["rt", "stm32f411"]
+
+[[example]]
+name = "can-send"
+required-features = ["can", "stm32f405"]
+
+[[example]]
+name = "i2s-audio-out"
+required-features = ["stm32f411", "rt", "i2s"]
+
+[[example]]
+name = "i2s-audio-out-dma"
+required-features = ["stm32f411", "rt", "i2s"]
+
+[[example]]
+name = "rtic"
+required-features = ["rt", "stm32f407"]
+
+[[example]]
+name = "adc_dma_rtic"
+required-features = ["rt", "stm32f401"]
+
+[[example]]
+name = "serial-9bit"
+required-features = ["rt", "stm32f411"]
+
+[[example]]
+name = "st7789-lcd"
+required-features = ["rt", "stm32f412", "fsmc_lcd"]
+
+[[example]]
+name = "f413disco_lcd_ferris"
+required-features = ["rt", "stm32f413", "fsmc_lcd"]

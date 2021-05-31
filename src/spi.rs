@@ -352,7 +352,7 @@ use crate::rcc::Clocks;
 use crate::time::Hertz;
 
 /// SPI error
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum Error {
     /// Overrun occurred
     Overrun,
@@ -787,6 +787,9 @@ impl<PINS> Spi<SPI1, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb2enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -847,6 +850,9 @@ impl<PINS> Spi<SPI2, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb1enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -906,6 +912,9 @@ impl<PINS> Spi<SPI3, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb1enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -961,6 +970,9 @@ impl<PINS> Spi<SPI4, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb2enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -1015,6 +1027,9 @@ impl<PINS> Spi<SPI5, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb2enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -1064,6 +1079,9 @@ impl<PINS> Spi<SPI6, PINS> {
 
             // Enable clock.
             bb::set(&rcc.apb2enr, EN_BIT);
+
+            // Stall the pipeline to work around erratum 2.1.13 (DM00037591)
+            cortex_m::asm::dsb();
         }
 
         Spi { spi, pins }.init(mode, freq, clocks.pclk2(), frame_format, bit_order)
@@ -1211,10 +1229,19 @@ where
         let sr = self.spi.sr.read();
 
         Err(if sr.ovr().bit_is_set() {
+            // Read from the DR to clear the OVR bit
+            let _ = self.spi.dr.read();
             nb::Error::Other(Error::Overrun)
         } else if sr.modf().bit_is_set() {
+            // Write to CR1 to clear MODF
+            self.spi.cr1.modify(|_r, w| w);
             nb::Error::Other(Error::ModeFault)
         } else if sr.crcerr().bit_is_set() {
+            // Clear the CRCERR bit
+            self.spi.sr.modify(|_r, w| {
+                w.crcerr().clear_bit();
+                w
+            });
             nb::Error::Other(Error::Crc)
         } else if sr.txe().bit_is_set() {
             // NOTE(write_volatile) see note above
